@@ -45,11 +45,6 @@ The application uses two OpenWeatherMap API endpoints:
 
 ![Weather Web](https://github.com/user-attachments/assets/3a0c28b3-726b-4edb-915a-a6c574cc90cc)
 
-
-## Contributing
-
-Feel free to fork this project and submit pull requests for any improvements.
-
 ## License
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
