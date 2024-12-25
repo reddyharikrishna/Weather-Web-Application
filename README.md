@@ -43,7 +43,8 @@ The application uses two OpenWeatherMap API endpoints:
 
 ## Screenshots
 
-[Add your application screenshots here]
+![Weather Web](https://github.com/user-attachments/assets/3a0c28b3-726b-4edb-915a-a6c574cc90cc)
+
 
 ## Contributing
 
