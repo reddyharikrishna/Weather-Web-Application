@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="Enter city name" spellcheck="false">
+            <button><img src="images/search.png" alt="Search"></button>
+        </div>
+        <div class="error" style="display: none;">
+            <p>Invalid city name. Please try again.</p>
+        </div>
+        <div class="weather" style="display: none;">
+            <img src="images/default.png" class="weather-icon" alt="Weather Icon">
+            <h1 class="temp">-</h1>
+            <h2 class="city">-</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="images/humidity.png" alt="Humidity Icon">
+                    <div>
+                        <p class="humidity">-</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="images/wind.png" alt="Wind Speed Icon">
+                    <div>
+                        <p class="wind">-</p>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="images/pressure.jpeg" alt="Pressure Icon">
+                    <div>
+                        <p class="pressure">-</p>
+                        <p>Pressure</p>
+                    </div>
+                </div>
+            </div>
+            <div class="aqi-details">
+                <h3>Air Quality Index</h3>
+                <div class="col">
+                    <p>CO: <span class="co">-</span> μg/m³</p>
+                </div>
+                <div class="col">
+                    <p>NO: <span class="no">-</span> μg/m³</p>
+                </div>
+                <div class="col">
+                    <p>NO₂: <span class="no2">-</span> μg/m³</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apikey = "215c781ccd1394ac4628bfe0822f7aa1";
+        const apiurl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+        const airQualityUrl = "https://api.openweathermap.org/data/2.5/air_pollution?";
+
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon");
+
+        async function fetchWeather(city) {
+            try {
+                const response = await fetch(`${apiurl}${city}&appid=${apikey}`);
+                if (!response.ok) throw new Error("City not found");
+
+                const data = await response.json();
+                displayWeather(data);
+
+                // Fetch air quality
+                const { lat, lon } = data.coord;
+                fetchAirQuality(lat, lon);
+            } catch (error) {
+                displayError();
+            }
+        }
+
+        async function fetchAirQuality(lat, lon) {
+            try {
+                const response = await fetch(`${airQualityUrl}lat=${lat}&lon=${lon}&appid=${apikey}`);
+                if (!response.ok) throw new Error("Air quality data not found");
+
+                const data = await response.json();
+                displayAirQuality(data.list[0].components);
+            } catch (error) {
+                console.error("Air Quality Error:", error.message);
+            }
+        }
+
+        function displayWeather(data) {
+            document.querySelector(".city").textContent = data.name;
+            document.querySelector(".temp").textContent = `${Math.round(data.main.temp)}°C`;
+            document.querySelector(".humidity").textContent = `${data.main.humidity}%`;
+            document.querySelector(".wind").textContent = `${data.wind.speed} km/h`;
+            document.querySelector(".pressure").textContent = `${data.main.pressure} hPa`;
+
+            const weatherCondition = data.weather[0].main.toLowerCase();
+            const icons = {
+                clouds: "images/clouds.png",
+                clear: "images/clear.png",
+                rain: "images/rain.png",
+                drizzle: "images/drizzle.png",
+                mist: "images/mist.png",
+                default: "images/default.png"
+            };
+            weatherIcon.src = icons[weatherCondition] || icons.default;
+
+            document.querySelector(".error").style.display = "none";
+            document.querySelector(".weather").style.display = "block";
+        }
+
+        function displayAirQuality(components) {
+            document.querySelector(".co").textContent = components.co.toFixed(2);
+            document.querySelector(".no").textContent = components.no.toFixed(2);
+            document.querySelector(".no2").textContent = components.no2.toFixed(2);
+        }
+
+        function displayError() {
+            document.querySelector(".error").style.display = "block";
+            document.querySelector(".weather").style.display = "none";
+        }
+
+        searchBtn.addEventListener("click", () => {
+            const city = searchBox.value.trim();
+            if (city) fetchWeather(city);
+        });
+    </script>
+</body>
+</html>
+
